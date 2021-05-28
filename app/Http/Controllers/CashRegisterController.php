@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\BillsCoinsController;
+use App\Models\TblBillsMoney;
 
 class CashRegisterController extends Controller
 {
@@ -14,12 +15,44 @@ class CashRegisterController extends Controller
 		$this->billsCoins = new BillsCoinsController();
 	}
 
+	public function totalDay($date = '')
+	{
+		if($date == '') {
+			$date = date('Y-m-d');
+		}
+
+		$totalDay = $this->totalIn($date) - $this->totalOut($date);
+		dd($totalDay);
+	}
+
+	public function totalIn($date)
+	{
+		$total = TblBillsMoney::
+					whereDate('created_at', $date)->
+					where('status', '=', 'in')->
+					sum('total');
+		return $total;
+	}
+
+	public function totalOut($date)
+	{
+		$total = TblBillsMoney::
+					whereDate('created_at', $date)->
+					where('status', '=', 'out')->
+					sum('total');
+		return $total;
+
+	}
+
 	public function loadBase(Request $request)
 	{
-		$validations = $this->preValidationLoadBase($request->all());
+		$this->totalDay();
+		$noValidations = $this->preValidationLoadBase($request->all());
 
-		if(count($validations) === 0) {
-			return $this->response('The validation is success');
+		if(count($noValidations) === 0) {
+			foreach($request->all() as $values) {
+				$this->billsCoins->store($values);
+			}
 		} else {
 			return $this->response(['errors'=>$validations], 422);
 		}
@@ -33,7 +66,6 @@ class CashRegisterController extends Controller
 		foreach($moneysAndBills as $moneyAndBill) {
 			$this->billsCoins->validationTypes($moneyAndBill);
 			$validationsTemp = $this->billsCoins->getValidationFailed();
-
 			if(!$validationsTemp->isValid) {
 				$validations[] = $validationsTemp->errors;
 			}

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Rules\moneyAndBillsRules;
+use App\Models\TblBillsMoney;
 
 class BillsCoinsController extends Controller
 {
@@ -14,6 +15,23 @@ class BillsCoinsController extends Controller
 	public function getValidationFailed()
 	{
 		return $this->validationFailed;
+	}
+
+	public function store($request)
+	{
+		$saveValue = new TblBillsMoney();
+		if($this->validationTypes($request)) {
+			$saveValue->type = $request['type'];
+			$saveValue->value = $request['value'];
+			$saveValue->amount = $request['amount'];
+			$saveValue->total = $request['value'] * $request['amount'];
+			$saveValue->status = 'in';
+			$saveValue->save();
+		} else {
+			dd($this->getValidationFailed());
+		}
+		dd($saveValue);
+		return $saveValue;
 	}
 
 	public function validationTypes($moneyAndBills)
