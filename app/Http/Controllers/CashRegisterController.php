@@ -16,16 +16,30 @@ class CashRegisterController extends Controller
 
 	public function loadBase(Request $request)
 	{
-		try {
+		$validations = $this->preValidationLoadBase($request->all());
 
-			foreach($request->all() as $moneyAndBill) {
-				$this->billsCoins->validationTypes($moneyAndBill);
-			}
+		if(count($validations) === 0) {
 			return $this->response('The validation is success');
-
-		} catch (\Exception $th) {
-			return $this->response($this->billsCoins->getValidationFailed(), 422);
+		} else {
+			return $this->response(['errors'=>$validations], 422);
 		}
+
+
+	}
+
+	private function preValidationLoadBase($moneysAndBills)
+	{
+		$validations = [];
+		foreach($moneysAndBills as $moneyAndBill) {
+			$this->billsCoins->validationTypes($moneyAndBill);
+			$validationsTemp = $this->billsCoins->getValidationFailed();
+
+			if(!$validationsTemp->isValid) {
+				$validations[] = $validationsTemp->errors;
+			}
+
+		}
+		return $validations;
 	}
 
 	public function makePayment(Request $request)
