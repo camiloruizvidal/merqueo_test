@@ -13,13 +13,6 @@ class Controller extends BaseController
 
 	public function response($data, $codeHTTP = 200)
 	{
-		$dataEncodeJson = $this->returnJson($data);
-		return response()->json(['data' => $dataEncodeJson], $codeHTTP);
-	}
-	private function returnJson($string)
-	{
-		$valueJson = json_decode($string);
-		$isJson = json_last_error() === JSON_ERROR_NONE;
-		return $isJson ? $valueJson : $string;
+		return response()->json(['data' => $data], $codeHTTP);
 	}
 }

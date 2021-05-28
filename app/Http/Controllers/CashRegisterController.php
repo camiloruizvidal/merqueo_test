@@ -22,7 +22,7 @@ class CashRegisterController extends Controller
 			return $this->response($validation);
 
 		} catch (\Exception $th) {
-			return $this->response($th->getMessage(), 422);
+			return $this->response($this->billsCoins->getValidationFailed(), 422);
 		}
 	}
 
@@ -34,7 +34,7 @@ class CashRegisterController extends Controller
 			return $this->response($validation);
 
 		} catch (\Exception $th) {
-			return $this->response($th->getMessage(), 422);
+			return $this->response($this->billsCoins->getValidationFailed(), 422);
 		}
 	}
 

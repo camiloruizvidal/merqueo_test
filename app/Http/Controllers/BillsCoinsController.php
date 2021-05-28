@@ -8,9 +8,15 @@ use Illuminate\Validation\Rule;
 
 class BillsCoinsController extends Controller
 {
+	private $validationFailed = null;
+
+	public function getValidationFailed()
+	{
+		return $this->validationFailed;
+	}
+
 	public function validationTypes(Request $request)
 	{
-
 		$validation = Validator::make(
 			$request->all(),
 			[
@@ -38,14 +44,13 @@ class BillsCoinsController extends Controller
 			]
 		);
 
-		$response = new \stdClass;
-		$response->isValid = !$validation->fails();
-		$response->errors = $validation->errors();
+		$this->validationFailed = new \stdClass;
+		$this->validationFailed->isValid = !$validation->fails();
+		$this->validationFailed->errors = $validation->errors();
 
 		if($validation->fails()) {
-			throw new \Exception($validation->errors());
+			throw new \Exception('The validation is failed');
 		}
 
-		return $response;
 	}
 }
