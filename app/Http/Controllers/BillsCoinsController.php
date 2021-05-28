@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use App\Rules\moneyAndBillsRules;
 
 class BillsCoinsController extends Controller
 {
@@ -15,34 +16,20 @@ class BillsCoinsController extends Controller
 		return $this->validationFailed;
 	}
 
-	public function validationTypes(Request $request)
+	public function validationTypes($moneyAndBills)
 	{
 		$validation = Validator::make(
-			$request->all(),
+			$moneyAndBills,
 			[
 				'tipo' => ['required', Rule::in(['billetes', 'monedas'])],
-				'valor' =>
-				[
-					'required',
-					Rule::in([
-						100000,
-						50000,
-						20000,
-						10000,
-						5000,
-						1000,
-						500,
-						200,
-						100,
-						50
-					]),
-				],
+				'valor' => ['required', new moneyAndBillsRules($moneyAndBills)]
 			],
 			[
-				'required' => 'El atributo ":attribute" es obligatorio.',
+				'required' => 'El atributo :attribute es obligatorio.',
 				'in'=>'El atributo ":attribute" = ":input" es invalido'
 			]
 		);
+
 
 		$this->validationFailed = new \stdClass;
 		$this->validationFailed->isValid = !$validation->fails();
