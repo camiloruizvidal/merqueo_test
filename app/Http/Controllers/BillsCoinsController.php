@@ -21,8 +21,8 @@ class BillsCoinsController extends Controller
 		$validation = Validator::make(
 			$moneyAndBills,
 			[
-				'tipo' => ['required', Rule::in(['billetes', 'monedas'])],
-				'valor' => ['required', new moneyAndBillsRules($moneyAndBills)]
+				'type' => ['required', Rule::in(['billetes', 'monedas'])],
+				'value' => ['required', new moneyAndBillsRules($moneyAndBills)]
 			],
 			[
 				'required' => 'El atributo :attribute es obligatorio.',
@@ -35,9 +35,7 @@ class BillsCoinsController extends Controller
 		$this->validationFailed->isValid = !$validation->fails();
 		$this->validationFailed->errors = $validation->errors();
 
-		if($validation->fails()) {
-			throw new \Exception('The validation is failed');
-		}
+		return !$validation->fails();
 
 	}
 }
