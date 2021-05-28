@@ -8,11 +8,8 @@ use Illuminate\Validation\Rule;
 
 class BillsCoinsController extends Controller
 {
-	public function validateBillsCoin(Request $request)
+	public function validationTypes(Request $request)
 	{
-		$response = new \stdClass;
-		$response->validation = true;
-		$response->errors = [];
 
 		$validation = Validator::make(
 			$request->all(),
@@ -41,9 +38,12 @@ class BillsCoinsController extends Controller
 			]
 		);
 
+		$response = new \stdClass;
+		$response->isValid = !$validation->fails();
+		$response->errors = $validation->errors();
+
 		if($validation->fails()) {
-			$response->validation = false;
-			$response->errors = $validation->errors();
+			throw new \Exception($validation->errors());
 		}
 
 		return $response;

@@ -7,7 +7,7 @@ use App\Http\Controllers\BillsCoinsController;
 
 class CashRegisterController extends Controller
 {
-	private $billetes;
+	private $billsCoins;
 
 	public function __construct()
 	{
@@ -16,16 +16,26 @@ class CashRegisterController extends Controller
 
 	public function loadBase(Request $request)
 	{
-		$validation = false;
-		$validation = $this->billsCoins->validateBillsCoin($request);
-		return [$validation];
+		try {
+
+			$validation = $this->billsCoins->validationTypes($request);
+			return $this->response($validation);
+
+		} catch (\Exception $th) {
+			return $this->response($th->getMessage(), 422);
+		}
 	}
 
 	public function makePayment(Request $request)
 	{
-		$validation = false;
-		$validation = $this->billetes->validateBillsCoin($request);
-		return [$validation];
+		try {
+
+			$validation = $this->billsCoins->validationTypes($request);
+			return $this->response($validation);
+
+		} catch (\Exception $th) {
+			return $this->response($th->getMessage(), 422);
+		}
 	}
 
 }
