@@ -18,8 +18,10 @@ class CashRegisterController extends Controller
 	{
 		try {
 
-			$validation = $this->billsCoins->validationTypes($request);
-			return $this->response($validation);
+			foreach($request->all() as $moneyAndBill) {
+				$this->billsCoins->validationTypes($moneyAndBill);
+			}
+			return $this->response('The validation is success');
 
 		} catch (\Exception $th) {
 			return $this->response($this->billsCoins->getValidationFailed(), 422);
@@ -29,8 +31,7 @@ class CashRegisterController extends Controller
 	public function makePayment(Request $request)
 	{
 		try {
-
-			$validation = $this->billsCoins->validationTypes($request);
+			$validation = $this->billsCoins->validationTypes($request->all());
 			return $this->response($validation);
 
 		} catch (\Exception $th) {
