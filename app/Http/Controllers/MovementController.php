@@ -54,7 +54,7 @@ class MovementController extends Controller
 	public static function findWithDetail($movementBoxId)
 	{
 		return TblMovementBox::
-					with('detail.money')->
-					find($movementBoxId);
+			   with('detail.money')->
+			   find($movementBoxId);
 	}
 }

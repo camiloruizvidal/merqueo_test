@@ -19,14 +19,13 @@ class CashRegisterController extends Controller
 	public function loadBase(Request $request)
 	{
 		$noValidations = $this->preValidationLoadBase($request->all());
-		$movement = null;
 
 		if(count($noValidations) === 0) {
 
 			$entryValues = $request->all();
 			$movement = MovementController::registerMovement('loadBase', $entryValues);
-			foreach($entryValues as $money) {
 
+			foreach($entryValues as $money) {
 				MovementController::registerMovementDetail(
 					$movement->id,
 					$money['type'],
@@ -35,10 +34,13 @@ class CashRegisterController extends Controller
 					'input'
 				);
 			}
+
 		} else {
 			return $this->response(['errors'=>$validations], 422);
 		}
+
 		$response = MovementController::findWithDetail($movement->id);
+
 		return $this->response($response);
 	}
 
@@ -46,13 +48,16 @@ class CashRegisterController extends Controller
 	{
 		$validations = [];
 		foreach($moneysAndBills as $moneyAndBill) {
+
 			$this->billsCoins->validationTypes($moneyAndBill);
 			$validationsTemp = $this->billsCoins->getValidationFailed();
+
 			if(!$validationsTemp->isValid) {
 				$validations[] = $validationsTemp->errors;
 			}
 
 		}
+
 		return $validations;
 	}
 
@@ -60,9 +65,10 @@ class CashRegisterController extends Controller
 	{
 		try {
 			$validation = $this->billsCoins->validationTypes($request->all());
-			return $this->response($validation);
 
+			return $this->response($validation);
 		} catch (\Exception $th) {
+
 			return $this->response($this->billsCoins->getValidationFailed(), 422);
 		}
 	}

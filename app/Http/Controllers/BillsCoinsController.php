@@ -62,7 +62,6 @@ class BillsCoinsController extends Controller
 		$this->validationFailed->errors = $validation->errors();
 
 		return !$validation->fails();
-
 	}
 
 }
