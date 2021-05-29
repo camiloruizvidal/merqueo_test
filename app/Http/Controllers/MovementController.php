@@ -54,7 +54,16 @@ class MovementController extends Controller
 	public static function findWithDetail($movementBoxId)
 	{
 		return TblMovementBox::
-				with(['detail.money'])->
+				with(['detail' => function($query)
+				{
+					$query
+					->join(
+						'tbl_bills_money',
+						'tbl_movement_box_detail.bills_money_id',
+						'=',
+						'tbl_bills_money.id'
+					);
+				}])->
 				find($movementBoxId);
 	}
 }
