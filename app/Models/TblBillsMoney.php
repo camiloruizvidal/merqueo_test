@@ -15,7 +15,7 @@ class TblBillsMoney extends Model
 	protected $fillable = [
 		'type',
 		'value',
-		'amount',
+		'count',
 	];
 
 }

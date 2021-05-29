@@ -13,7 +13,7 @@ class CreateTblBillsMoney extends Migration
 			$table->id();
 			$table->integer('value');
 			$table->enum('type', ['billetes', 'monedas']);
-			$table->integer('amount')->default(0);
+			$table->integer('count')->default(0);
 			$table->timestamps();
 
 		});

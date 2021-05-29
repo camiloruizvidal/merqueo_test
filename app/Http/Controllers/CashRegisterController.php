@@ -30,7 +30,7 @@ class CashRegisterController extends Controller
 					$movement->id,
 					$money['type'],
 					$money['value'],
-					$money['amount'],
+					$money['count'],
 					'input'
 				);
 			}

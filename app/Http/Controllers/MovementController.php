@@ -12,7 +12,7 @@ class MovementController extends Controller
 	public static function registerMovement($typeMovement, $entryValues)
 	{
 		$valuesTotal = array_map(function($entryValu) {
-			return $entryValu['value'] * $entryValu['amount'];
+			return $entryValu['value'] * $entryValu['count'];
 		}, $entryValues);
 		$total = array_sum($valuesTotal);
 
@@ -28,7 +28,7 @@ class MovementController extends Controller
 		$movementBoxId,
 		$billOrCoin,
 		$valueMoney,
-		$amount,
+		$count,
 		$typeMovement
 	)
 	{
@@ -37,14 +37,14 @@ class MovementController extends Controller
 		$movementDetail = TblMovementBoxDetail::create([
 			'movement_box_id' => $movementBoxId,
 			'bills_money_id' => $money->id,
-			'amount' => $amount,
+			'amount' => $count,
 			'type_movement' => $typeMovement,
 		]);
 
 		BillsCoinsController::updateMoney(
 			$billOrCoin,
 			$valueMoney,
-			$amount,
+			$count,
 			$typeMovement
 		);
 
@@ -54,7 +54,17 @@ class MovementController extends Controller
 	public static function findWithDetail($movementBoxId)
 	{
 		return TblMovementBox::
-			   with('detail.money')->
-			   find($movementBoxId);
+				with(['detail' => function($query)
+				{
+					$query
+					//->select('tbl_movement_box_detail.amount')
+					->join(
+						'tbl_bills_money',
+						'tbl_movement_box_detail.bills_money_id',
+						'=',
+						'tbl_bills_money.id'
+					);
+				}])->
+				find($movementBoxId);
 	}
 }
