@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\BillsCoinsController;
+use App\Http\Controllers\MovementController;
 use App\Models\TblBillsMoney;
 
 class CashRegisterController extends Controller
@@ -15,49 +16,30 @@ class CashRegisterController extends Controller
 		$this->billsCoins = new BillsCoinsController();
 	}
 
-	public function totalDay($date = '')
-	{
-		if($date == '') {
-			$date = date('Y-m-d');
-		}
-
-		$totalDay = $this->totalIn($date) - $this->totalOut($date);
-		dd($totalDay);
-	}
-
-	public function totalIn($date)
-	{
-		$total = TblBillsMoney::
-					whereDate('created_at', $date)->
-					where('status', '=', 'in')->
-					sum('total');
-		return $total;
-	}
-
-	public function totalOut($date)
-	{
-		$total = TblBillsMoney::
-					whereDate('created_at', $date)->
-					where('status', '=', 'out')->
-					sum('total');
-		return $total;
-
-	}
-
 	public function loadBase(Request $request)
 	{
-		$this->totalDay();
 		$noValidations = $this->preValidationLoadBase($request->all());
+		$movement = null;
 
 		if(count($noValidations) === 0) {
-			foreach($request->all() as $values) {
-				$this->billsCoins->store($values);
+
+			$entryValues = $request->all();
+			$movement = MovementController::registerMovement('loadBase', $entryValues);
+			foreach($entryValues as $money) {
+
+				MovementController::registerMovementDetail(
+					$movement->id,
+					$money['type'],
+					$money['value'],
+					$money['amount'],
+					'input'
+				);
 			}
 		} else {
 			return $this->response(['errors'=>$validations], 422);
 		}
-
-
+		$response = MovementController::findWithDetail($movement->id);
+		return $this->response($response);
 	}
 
 	private function preValidationLoadBase($moneysAndBills)

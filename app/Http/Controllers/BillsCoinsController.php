@@ -17,21 +17,29 @@ class BillsCoinsController extends Controller
 		return $this->validationFailed;
 	}
 
-	public function store($request)
+	public static function findBillsCoin($type, $value)
 	{
-		$saveValue = new TblBillsMoney();
-		if($this->validationTypes($request)) {
-			$saveValue->type = $request['type'];
-			$saveValue->value = $request['value'];
-			$saveValue->amount = $request['amount'];
-			$saveValue->total = $request['value'] * $request['amount'];
-			$saveValue->status = 'in';
-			$saveValue->save();
-		} else {
-			dd($this->getValidationFailed());
-		}
-		dd($saveValue);
-		return $saveValue;
+		return TblBillsMoney::firstOrCreate([
+			'type' => $type,
+			'value' => $value,
+		]);
+	}
+
+	public static function updateMoney($type, $value, $amount, $entry)
+	{
+		$searchMoney = self::findBillsCoin($type, $value);
+
+		$amount = $entry == 'input'
+				  ? $searchMoney->amount + $amount
+				  : $searchMoney->amount - $amount;
+
+		$money = TblBillsMoney::find($searchMoney->id);
+		$money->type = $type;
+		$money->value = $value;
+		$money->amount = $amount;
+		$money->save();
+
+		return $money;
 	}
 
 	public function validationTypes($moneyAndBills)
@@ -56,4 +64,5 @@ class BillsCoinsController extends Controller
 		return !$validation->fails();
 
 	}
+
 }

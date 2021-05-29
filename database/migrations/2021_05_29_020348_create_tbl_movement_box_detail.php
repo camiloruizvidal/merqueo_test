@@ -14,7 +14,7 @@ class CreateTblMovementBoxDetail extends Migration
 			$table->unsignedBigInteger('movement_box_id');
 			$table->unsignedBigInteger('bills_money_id');
 			$table->integer('amount');
-			$table->enum('type_movement', ['input','output']);
+			$table->enum('type_movement', ['input', 'output']);
 			$table->timestamps();
 
 			$table->foreign('movement_box_id')
