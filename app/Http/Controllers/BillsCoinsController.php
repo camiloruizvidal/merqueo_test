@@ -30,8 +30,8 @@ class BillsCoinsController extends Controller
 		$searchMoney = self::findBillsCoin($type, $value);
 
 		$count = $entry == 'input'
-				  ? $searchMoney->amount + $count
-				  : $searchMoney->amount - $count;
+				  ? $searchMoney->count + $count
+				  : $searchMoney->count - $count;
 
 		$money = TblBillsMoney::find($searchMoney->id);
 		$money->type = $type;
