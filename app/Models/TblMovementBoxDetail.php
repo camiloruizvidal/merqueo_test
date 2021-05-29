@@ -11,7 +11,13 @@ class TblMovementBoxDetail extends Model
 
 	protected $primaryKey = 'id';
 
-	protected $hidden = ['created_at', 'updated_at'];
+	protected $hidden = [
+		'id',
+		'created_at',
+		'updated_at',
+		'movement_box_id',
+		'bills_money_id'
+	];
 
 	protected $fillable = [
 		'movement_box_id',
