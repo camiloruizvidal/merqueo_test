@@ -36,11 +36,35 @@ class CashRegisterController extends Controller
 			}
 
 		} else {
-			return $this->response(['errors'=>$validations], 422);
+			return $this->response(['errors'=>$noValidations], 422);
 		}
 
 		$response = MovementController::findWithDetail($movement->id);
 
+		return $this->response($response);
+	}
+
+	/*
+	TODO
+	*/
+	public function getStatusCash (Request $request)
+	{
+
+	}
+
+	public function getMovements(Request $request)
+	{
+		$movements = MovementController::getMovements(
+			$request->input('dateStart'),
+			$request->input('dateFinish')
+		);
+
+		return $this->response($movements);
+	}
+
+	public function emptyCash()
+	{
+		$response = MovementController::emptyCash();
 		return $this->response($response);
 	}
 
@@ -63,14 +87,23 @@ class CashRegisterController extends Controller
 
 	public function makePayment(Request $request)
 	{
-		try {
-			$validation = $this->billsCoins->validationTypes($request->all());
-
-			return $this->response($validation);
-		} catch (\Exception $th) {
-
-			return $this->response($this->billsCoins->getValidationFailed(), 422);
+		$response = null;
+		foreach($request->input('biilsAndCoin') as $billOrCoin) {
+			$validation = $this->billsCoins->validationTypes($billOrCoin);
 		}
+
+		$dataValidation = $this->billsCoins->getValidationFailed();
+		if($dataValidation->isValid) {
+
+			$moneyInBox = BillsCoinsController::getAllBillMoney();
+			dd($moneyInBox);
+			$response = $this->response($validation);
+		} else {
+
+			$response = $this->response($this->billsCoins->getValidationFailed(), 422);
+		}
+
+		return $response;
 	}
 
 }

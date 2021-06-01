@@ -24,6 +24,12 @@ Route::prefix('v1')->group(function () {
 
 	Route::prefix('caja')->group(function () {
 		Route::post('cargarBase', [CashRegisterController::class, 'loadBase']);
+		Route::get('vaciar', [CashRegisterController::class, 'emptyCash']);
+
+		/*TODO*/
+		Route::post('estado', [CashRegisterController::class, 'getStatusCash']);
+
+		Route::post('movimientos', [CashRegisterController::class, 'getMovements']);
 		Route::post('realizarPago', [CashRegisterController::class, 'makePayment']);
 	});
 

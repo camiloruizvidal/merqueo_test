@@ -28,18 +28,22 @@ class BillsCoinsController extends Controller
 	public static function updateMoney($type, $value, $count, $entry)
 	{
 		$searchMoney = self::findBillsCoin($type, $value);
-
-		$count = $entry == 'input'
+		$updatedCount = $entry == 'input'
 				  ? $searchMoney->count + $count
 				  : $searchMoney->count - $count;
 
 		$money = TblBillsMoney::find($searchMoney->id);
 		$money->type = $type;
 		$money->value = $value;
-		$money->count = $count;
+		$money->count = $updatedCount;
 		$money->save();
 
 		return $money;
+	}
+
+	public static function getAllBillMoney()
+	{
+		return TblBillsMoney::where('count', '>', 0)->get();
 	}
 
 	public function validationTypes($moneyAndBills)

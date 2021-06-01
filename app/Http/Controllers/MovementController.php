@@ -66,4 +66,53 @@ class MovementController extends Controller
 				}])->
 				find($movementBoxId);
 	}
+
+	public static function emptyCash()
+	{
+		$billsMoneys = BillsCoinsController::getAllBillMoney();
+		$idMovement = self::registerMovement('emptyBox', $billsMoneys->toArray());
+
+		foreach($billsMoneys as $billMoney) {
+
+			self::registerMovementDetail(
+				$idMovement->id,
+				$billMoney->type,
+				$billMoney->value,
+				$billMoney->count,
+				'output'
+			);
+
+		}
+
+		$movementEmpty = self::findWithDetail($idMovement->id);
+		return $movementEmpty;
+	}
+
+	/*
+		$dateTimeStart and $dateTimeFinish type date
+		format YYYY-mm-dd
+	*/
+	public static function getMovements($dateStart, $dateFinish = NULL)
+	{
+		$movement = TblMovementBox::
+		with(['detail' => function($query)
+		{
+			$query->
+			join(
+				'tbl_bills_money',
+				'tbl_movement_box_detail.bills_money_id',
+				'=',
+				'tbl_bills_money.id'
+			);
+		}])->
+		whereDate('created_at', '>=', $dateStart)->
+		orderBy('type')->orderBy('created_at');
+
+		if(!is_null($dateFinish)) {
+			$movement = $movement->whereDate('created_at', '<=', $dateFinish);
+		}
+
+		return $movement->get();
+	}
+
 }
