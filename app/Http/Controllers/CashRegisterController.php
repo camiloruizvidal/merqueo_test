@@ -87,60 +87,14 @@ class CashRegisterController extends Controller
 
 	public function makePayment(Request $request)
 	{
-		$response = null;
+		$change = MovementController::makePayment(
+					$request->input('biilsAndCoin'),
+					$request->input('totalPay')
+				  );
 
-		foreach($request->input('biilsAndCoin') as $billOrCoin) {
-			$this->billsCoins->validationTypes($billOrCoin);
-		}
-
-		$dataValidation = $this->billsCoins->getValidationFailed();
-		if($dataValidation->isValid) {
-
-			$totalMoney = $this->sumMoney($request->input('biilsAndCoin'));
-			$change = $totalMoney - $request->input('totalPay');
-
-			$moneyChange = [];
-			$moneyInBox = BillsCoinsController::getAllBillMoney();
-			$changeReduce = $change;
-			foreach($moneyInBox as $money) {
-				if($changeReduce>=$money['value']) {
-
-
-					$countNecesary = floor($changeReduce/$money['value']);
-					if($countNecesary>$money['count']) {
-						$countNecesary = $money['count'];
-					}
-
-					$moneyChange[] = [
-						'money' => number_format($money['value']),
-						'count' => $countNecesary,
-					];
-
-					$changeReduce = $changeReduce - $money['value'] * $countNecesary;
-				}
-			}
-
-			$response = $this->response([
-				'change'=>$change,
-				'moneyChange'=>$moneyChange
-			]);
-
-		} else {
-
-			$response = $this->response($this->billsCoins->getValidationFailed(), 422);
-		}
-
-		return $response;
+		return $this->response($change);
 	}
 
-	private function sumMoney($moneys)
-	{
-		$totalSum = array_reduce($moneys, function($total, $money)
-		{
-			$total += $money['value'] * $money['count'];
-			return $total;
-		});
-		return $totalSum;
-	}
+
 
 }
