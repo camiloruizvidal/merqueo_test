@@ -43,7 +43,7 @@ class BillsCoinsController extends Controller
 
 	public static function getAllBillMoney()
 	{
-		return TblBillsMoney::where('count', '>', 0)->get();
+		return TblBillsMoney::where('count', '>', 0)->orderBy('value','DESC')->get();
 	}
 
 	public function validationTypes($moneyAndBills)
