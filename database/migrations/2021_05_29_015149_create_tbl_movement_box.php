@@ -10,7 +10,7 @@ class CreateTblMovementBox extends Migration
 	{
 		Schema::create('tbl_movement_box', function (Blueprint $table) {
 			$table->id();
-			$table->enum('type', ['payment', 'loadBase', 'emptyBox']);
+			$table->enum('type', ['payment', 'loadBase', 'emptyBox', 'changeMoney']);
 			$table->integer('total')->nullable();
 			$table->timestamps();
 		});

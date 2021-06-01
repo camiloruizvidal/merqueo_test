@@ -3,17 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\BillsCoinsController;
 use App\Http\Controllers\MovementController;
+use App\Models\TblMovementBox;
 use App\Models\TblBillsMoney;
 
 class CashRegisterController extends Controller
 {
 	private $billsCoins;
+	private $movement;
 
 	public function __construct()
 	{
-		$this->billsCoins = new BillsCoinsController();
+		$this->billsCoins = new TblBillsMoney();
 	}
 
 	public function loadBase(Request $request)
@@ -23,10 +24,10 @@ class CashRegisterController extends Controller
 		if(count($noValidations) === 0) {
 
 			$entryValues = $request->all();
-			$movement = MovementController::registerMovement('loadBase', $entryValues);
+			$movement = TblMovementBox::registerMovement('loadBase', $entryValues);
 
 			foreach($entryValues as $money) {
-				MovementController::registerMovementDetail(
+				TblMovementBox::registerMovementDetail(
 					$movement->id,
 					$money['type'],
 					$money['value'],
@@ -39,7 +40,7 @@ class CashRegisterController extends Controller
 			return $this->response(['errors'=>$noValidations], 422);
 		}
 
-		$response = MovementController::findWithDetail($movement->id);
+		$response = TblMovementBox::findWithDetail($movement->id);
 
 		return $this->response($response);
 	}
@@ -54,7 +55,7 @@ class CashRegisterController extends Controller
 
 	public function getMovements(Request $request)
 	{
-		$movements = MovementController::getMovements(
+		$movements = TblMovementBox::getMovements(
 			$request->input('dateStart'),
 			$request->input('dateFinish')
 		);
@@ -64,7 +65,7 @@ class CashRegisterController extends Controller
 
 	public function emptyCash()
 	{
-		$response = MovementController::emptyCash();
+		$response = TblMovementBox::emptyCash();
 		return $this->response($response);
 	}
 
@@ -87,7 +88,7 @@ class CashRegisterController extends Controller
 
 	public function makePayment(Request $request)
 	{
-		$change = MovementController::makePayment(
+		$change = TblMovementBox::makePayment(
 					$request->input('biilsAndCoin'),
 					$request->input('totalPay')
 				  );
