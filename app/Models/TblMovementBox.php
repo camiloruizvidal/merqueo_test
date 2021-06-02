@@ -26,7 +26,7 @@ class TblMovementBox extends Model
 
 	public static function newMovement($typeMovement, $entryValues)
 	{
-		$types=[
+		$typesMovements = [
 			'payment' => 'input',
 			'loadBase' => 'input',
 			'emptyBox' => 'output',
@@ -39,20 +39,21 @@ class TblMovementBox extends Model
 
 			self::registerMovementDetail(
 				$movement->id,
-				$billMoney->type,
-				$billMoney->value,
-				$billMoney->count,
-				$types[$typeMovement]
+				$billMoney['type'],
+				$billMoney['value'],
+				$billMoney['count'],
+				$typesMovements[$typeMovement]
 			);
 
 		}
+		return $movement;
 
 	}
 
 	public static function registerMovement($typeMovement, $entryValues)
 	{
 		$valuesTotal = array_map(function($entryValu) {
-			return $entryValu->value * $entryValu->count;
+			return $entryValu['value'] * $entryValu['count'];
 		}, $entryValues);
 		$total = array_sum($valuesTotal);
 

@@ -24,17 +24,7 @@ class CashRegisterController extends Controller
 		if(count($noValidations) === 0) {
 
 			$entryValues = $request->all();
-			$movement = TblMovementBox::registerMovement('loadBase', $entryValues);
-
-			foreach($entryValues as $money) {
-				TblMovementBox::registerMovementDetail(
-					$movement->id,
-					$money['type'],
-					$money['value'],
-					$money['count'],
-					'input'
-				);
-			}
+			$movement = TblMovementBox::newMovement('loadBase', $entryValues);
 
 		} else {
 			return $this->response(['errors'=>$noValidations], 422);
