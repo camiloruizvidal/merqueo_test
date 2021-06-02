@@ -112,6 +112,7 @@ class TblMovementBox extends Model
 			$validations->validationTypes($billOrCoin);
 		}
 		$dataValidation = $validations->getValidationFailed();
+
 		if(!$dataValidation->isValid) {
 			return [
 				'validate' =>false,
@@ -123,9 +124,7 @@ class TblMovementBox extends Model
 			$total += $money['value'] * $money['count'];
 			return $total;
 		});
-
 		$change = $totalMoney - $totalPay;
-
 		$moneyInBox = TblBillsMoney::getAllBillMoney()->toArray();
 		$totalMoneyInBox = array_reduce($moneyInBox, function($total, $money) {
 			$total += $money['value'] * $money['count'];
@@ -145,9 +144,10 @@ class TblMovementBox extends Model
 		foreach($moneyInBox as $money) {
 			if($changeReduce >= $money['value']) {
 				$countNecesary = floor($changeReduce / $money['value']);
-				if($countNecesary > $money['count']) {
-					$countNecesary = $money['count'];
-				}
+
+				$countNecesary = ($countNecesary > $money['count'])
+									? $money['count']
+									: $countNecesary;
 
 				$moneyChange[] = [
 					'value' => $money['value'],
@@ -203,8 +203,8 @@ class TblMovementBox extends Model
 	}
 
 	/*
-	*	@param string $dateStart Fecha de inicio de la busqueda en formato 'YY-mm-dd'.
-	*	@param string $dateFinish Fecha de fin de la busqueda en formato 'YY-mm-dd'.
+	* @param string $dateStart Fecha de inicio de la busqueda en formato 'YY-mm-dd'.
+	* @param string $dateFinish Fecha de fin de la busqueda en formato 'YY-mm-dd'.
 	*/
 	public static function getMovements($dateStart, $dateFinish = NULL)
 	{
