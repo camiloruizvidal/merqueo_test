@@ -15,4 +15,10 @@ class Controller extends BaseController
 	{
 		return response()->json(['data' => $data], $codeHTTP);
 	}
+
+	public function responseError($data, $codeHTTP = 422)
+	{
+		return response()->json(['data' => $data], $codeHTTP);
+	}
+
 }

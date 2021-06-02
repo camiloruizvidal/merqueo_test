@@ -14,12 +14,10 @@ class CashRegisterController extends Controller
 		$noValidations = $this->preValidationLoadBase($request->all());
 
 		if($noValidations) {
-
 			$entryValues = $request->all();
 			$movement = TblMovementBox::newMovement('loadBase', $entryValues);
-
 		} else {
-			return $this->response(['errors'=>$noValidations], 422);
+			return $this->responseError(['errors'=>$noValidations]);
 		}
 
 		$response = TblMovementBox::findWithDetail($movement->id);
@@ -68,8 +66,12 @@ class CashRegisterController extends Controller
 					$request->input('biilsAndCoin'),
 					$request->input('totalPay')
 				  );
-
-		return $this->response($change);
+		$validate = $change['validate'];
+		if($validate) {
+			return $this->response($change);
+		} else {
+			return $this->responseError($change);
+		}
 	}
 
 
