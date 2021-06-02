@@ -25,12 +25,10 @@ class CashRegisterController extends Controller
 		return $this->response($response);
 	}
 
-	/*
-	TODO
-	*/
 	public function getStatusCash (Request $request)
 	{
-
+		$money = TblBillsMoney::getAllBillMoney();
+		return $this->response($money);
 	}
 
 	public function getMovements(Request $request)
