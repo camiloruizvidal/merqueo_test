@@ -129,12 +129,12 @@ class TblMovementBox extends Model
 					$countNecesary = $money['count'];
 				}
 
-				$register = new \stdClass();
-				$register->value = $money['value'];
-				$register->type = $money['type'];
-				$register->count = $countNecesary;
+				$moneyChange[] = [
+					'value' => $money['value'],
+					'type' => $money['type'],
+					'count' => $countNecesary,
+				];
 
-				$moneyChange[]= $register;
 				$changeReduce = $changeReduce - $money['value'] * $countNecesary;
 			}
 		}
@@ -148,6 +148,15 @@ class TblMovementBox extends Model
 		];
 
 		return $response;
+	}
+
+	public static function emptyCash()
+	{
+		$billsMoneys = TblBillsMoney::getAllBillMoney();
+		$idMovement = self::newMovement('emptyBox', $billsMoneys->toArray());
+
+		$movementEmpty = self::findWithDetail($idMovement->id);
+		return $movementEmpty;
 	}
 
 	public static function findWithDetail($movementBoxId)
@@ -164,27 +173,6 @@ class TblMovementBox extends Model
 					);
 				}])->
 				find($movementBoxId);
-	}
-
-	public static function emptyCash()
-	{
-		$billsMoneys = TblBillsMoney::getAllBillMoney();
-		$idMovement = self::registerMovement('emptyBox', $billsMoneys);
-
-		foreach($billsMoneys as $billMoney) {
-
-			self::registerMovementDetail(
-				$idMovement->id,
-				$billMoney->type,
-				$billMoney->value,
-				$billMoney->count,
-				'output'
-			);
-
-		}
-
-		$movementEmpty = self::findWithDetail($idMovement->id);
-		return $movementEmpty;
 	}
 
 	/*
