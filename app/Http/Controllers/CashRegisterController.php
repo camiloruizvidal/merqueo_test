@@ -9,19 +9,11 @@ use App\Models\TblBillsMoney;
 
 class CashRegisterController extends Controller
 {
-	private $billsCoins;
-	private $movement;
-
-	public function __construct()
-	{
-		$this->billsCoins = new TblBillsMoney();
-	}
-
 	public function loadBase(Request $request)
 	{
 		$noValidations = $this->preValidationLoadBase($request->all());
 
-		if(count($noValidations) === 0) {
+		if($noValidations) {
 
 			$entryValues = $request->all();
 			$movement = TblMovementBox::newMovement('loadBase', $entryValues);
@@ -61,19 +53,13 @@ class CashRegisterController extends Controller
 
 	private function preValidationLoadBase($moneysAndBills)
 	{
+		$billsCoins = new TblBillsMoney();
 		$validations = [];
 		foreach($moneysAndBills as $moneyAndBill) {
-
-			$this->billsCoins->validationTypes($moneyAndBill);
-			$validationsTemp = $this->billsCoins->getValidationFailed();
-
-			if(!$validationsTemp->isValid) {
-				$validations[] = $validationsTemp->errors;
-			}
-
+			$billsCoins->validationTypes($moneyAndBill);
 		}
 
-		return $validations;
+		return $billsCoins->getValidationFailed();
 	}
 
 	public function makePayment(Request $request)

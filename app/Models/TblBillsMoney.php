@@ -24,6 +24,11 @@ class TblBillsMoney extends Model
 		'count',
 	];
 
+	public function __construct()
+	{
+		$this->validationFailed = new \stdClass;
+	}
+
 	public function getValidationFailed()
 	{
 		return $this->validationFailed;
@@ -72,8 +77,6 @@ class TblBillsMoney extends Model
 			]
 		);
 
-
-		$this->validationFailed = new \stdClass;
 		$this->validationFailed->isValid = !$validation->fails();
 		$this->validationFailed->errors = $validation->errors();
 
