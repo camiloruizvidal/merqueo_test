@@ -95,19 +95,15 @@ class TblMovementBox extends Model
 	public static function makePayment($biilsAndCoin, $totalPay)
 	{
 		$validations = new TblBillsMoney();
-
 		foreach($biilsAndCoin as $billOrCoin) {
 			$validations->validationTypes($billOrCoin);
 		}
-
 		$dataValidation = $validations->getValidationFailed();
 		if(!$dataValidation->isValid) {
-
 			return [
 				'validate' =>false,
 				'message' => $validations->getValidationFailed(),
 			];
-
 		}
 
 		$totalMoney = array_reduce($biilsAndCoin, function($total, $money) {
@@ -117,14 +113,25 @@ class TblMovementBox extends Model
 
 		$change = $totalMoney - $totalPay;
 
+		$moneyInBox = TblBillsMoney::getAllBillMoney()->toArray();
+		$totalMoneyInBox = array_reduce($moneyInBox, function($total, $money) {
+			$total += $money['value'] * $money['count'];
+			return $total;
+		});
+
+		if($moneyInBox < $totalMoney || $change < 0) {
+			return [
+				'validate' =>false,
+				'message' => 'No hay dinero en caja suficiente',
+			];
+		}
+
 		$moneyChange = [];
-		$moneyInBox = TblBillsMoney::getAllBillMoney();
 		$changeReduce = $change;
 
 		foreach($moneyInBox as $money) {
 			if($changeReduce >= $money['value']) {
-
-				$countNecesary = floor($changeReduce/$money['value']);
+				$countNecesary = floor($changeReduce / $money['value']);
 				if($countNecesary > $money['count']) {
 					$countNecesary = $money['count'];
 				}
@@ -137,6 +144,13 @@ class TblMovementBox extends Model
 
 				$changeReduce = $changeReduce - $money['value'] * $countNecesary;
 			}
+		}
+
+		if($changeReduce>0) {
+			return [
+				'validate' =>false,
+				'message' => 'No hay dinero en caja suficiente',
+			];
 		}
 
 		self::newMovement('payment', $moneyChange);
@@ -176,8 +190,8 @@ class TblMovementBox extends Model
 	}
 
 	/*
-		$dateTimeStart and $dateTimeFinish type date
-		format YYYY-mm-dd
+	*	@param string $dateStart Fecha de inicio de la busqueda en formato 'YY-mm-dd'.
+	*	@param string $dateFinish Fecha de fin de la busqueda en formato 'YY-mm-dd'.
 	*/
 	public static function getMovements($dateStart, $dateFinish = NULL)
 	{
