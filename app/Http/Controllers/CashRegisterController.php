@@ -72,6 +72,4 @@ class CashRegisterController extends Controller
 		}
 	}
 
-
-
 }
