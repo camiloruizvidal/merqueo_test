@@ -24,13 +24,15 @@ class TblMovementBox extends Model
 		return $this->hasMany(TblMovementBoxDetail::class, 'movement_box_id');
 	}
 
-	public static function newMovement($typeMovement, $entryValues)
+	public static function newMovement($typeMovement, $entryValues, $outputPayment = [])
 	{
+		$input ='input';
+		$output = 'output';
 		$typesMovements = [
-			'payment' => 'input',
-			'loadBase' => 'input',
-			'emptyBox' => 'output',
-			'changeMoney' => 'output',
+			'payment' => $input,
+			'loadBase' => $input,
+			'emptyBox' => $output,
+			'changeMoney' => $output,
 		];
 
 		$movement = self::registerMovement($typeMovement, $entryValues);
@@ -42,9 +44,20 @@ class TblMovementBox extends Model
 				$billMoney['type'],
 				$billMoney['value'],
 				$billMoney['count'],
-				$typesMovements[$typeMovement]
+				$typesMovements[$typeMovement],
 			);
 
+		}
+		if($typeMovement == 'payment') {
+			foreach($outputPayment as $payments) {
+				self::registerMovementDetail(
+					$movement->id,
+					$payments['type'],
+					$payments['value'],
+					$payments['count'],
+					$output,
+				);
+			}
 		}
 		return $movement;
 
@@ -153,7 +166,7 @@ class TblMovementBox extends Model
 			];
 		}
 
-		self::newMovement('payment', $moneyChange);
+		self::newMovement('payment', $biilsAndCoin, $moneyChange);
 
 		return [
 			'validate' => true,
@@ -204,7 +217,9 @@ class TblMovementBox extends Model
 				'tbl_movement_box_detail.bills_money_id',
 				'=',
 				'tbl_bills_money.id'
-			);
+			)->
+			orderBy('type_movement')->
+			orderBy('value', 'DESC');
 		}])->
 		whereDate('created_at', '>=', $dateStart)->
 		orderBy('type')->orderBy('created_at');

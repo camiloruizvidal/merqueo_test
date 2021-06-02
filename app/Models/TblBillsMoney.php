@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Rules\moneyAndBillsRules;
 use Illuminate\Validation\Rule;
 use App\Models\TblBillsMoney;
+use DB;
 
 class TblBillsMoney extends Model
 {
@@ -36,10 +37,13 @@ class TblBillsMoney extends Model
 
 	public static function findBillsCoin($type, $value)
 	{
-		return TblBillsMoney::firstOrCreate([
-			'type' => $type,
-			'value' => $value,
-		]);
+		$data = ['type' => $type,'value' => $value];
+		$money = self::where($data)->first();
+		if(is_null($money)) {
+			$id = DB::table('tbl_bills_money')->insertGetId($data);
+			$money = self::find($id);
+		}
+		return $money;
 	}
 
 	public static function updateMoney($type, $value, $count, $entry)
@@ -49,7 +53,7 @@ class TblBillsMoney extends Model
 				  ? $searchMoney->count + $count
 				  : $searchMoney->count - $count;
 
-		$money = TblBillsMoney::find($searchMoney->id);
+		$money = self::find($searchMoney->id);
 		$money->type = $type;
 		$money->value = $value;
 		$money->count = $updatedCount;
@@ -60,7 +64,7 @@ class TblBillsMoney extends Model
 
 	public static function getAllBillMoney()
 	{
-		return TblBillsMoney::where('count', '>', 0)->orderBy('value','DESC')->get();
+		return self::where('count', '>', 0)->orderBy('value','DESC')->get();
 	}
 
 	public function validationTypes($moneyAndBills)
